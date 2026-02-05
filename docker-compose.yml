@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # Database (Critical)
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: swarm_admin_2024
+      POSTGRES_DB: app_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Redis (Disabled for Low-Memory Optimization)
+  # Uncomment for high-load production
+  # redis:
+  #   image: redis:alpine
+  #   ports:
+  #     - "6379:6379"
+
+  # Backend Core
+  backend:
+    build: ./backend
+    restart: always
+    command: uvicorn app.server:app --host 0.0.0.0 --port 8001
+    ports:
+      - "8001:8001"
+    environment:
+      DB_HOST: db
+      DB_USER: postgres
+      DB_PASS: swarm_admin_2024
+      DB_NAME: app_db
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN} 
+      # REDIS_HOST: redis
+    depends_on:
+      - db
+      # - redis
+
+  # Frontend Interface
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
