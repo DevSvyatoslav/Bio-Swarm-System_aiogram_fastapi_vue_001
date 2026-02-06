@@ -89,5 +89,5 @@ npm run dev
 ---
 
 ### Author
-*Architected by **devSvyatoslav** [INTJ] | Bio Swarm Core*
+ **devSvyatoslav** 
 ```
